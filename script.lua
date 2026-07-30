@@ -1,4 +1,4 @@
--- Roblox Auto Script / Fluent UI Framework
+-- Roblox Auto Script / Fluent UI Framework (Optimized for Mobile)
 -- Place ID for World 3: 93411036959889
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
@@ -10,7 +10,7 @@ local Window = Fluent:CreateWindow({
     SubTitle = "by Sajjad",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
-    Acrylic = true,
+    Acrylic = false,
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
@@ -21,8 +21,6 @@ local Tabs = {
     Shop = Window:AddTab({ Title = "Shop & Skins", Icon = "shopping-cart" }),
     Settings = Window:AddTab({ Title = "Performance & Settings", Icon = "settings" })
 }
-
-local Options = Fluent.Options
 
 -- State Variables
 local Config = {
@@ -39,7 +37,6 @@ local Config = {
     GhostMode = false,
     LowGraphics = false,
     BlackScreen = false,
-    LowFPS = false,
     AntiAFK = true,
     AutoRejoin = true
 }
@@ -65,15 +62,6 @@ Tabs.Main:AddSection("Rebirth & Speed")
 Tabs.Main:AddToggle("AutoRebirth", { Title = "Auto Rebirth (Based on Level)", Default = false, Callback = function(v) Config.AutoRebirth = v end })
 Tabs.Main:AddToggle("LockSpeed", { Title = "Speed Auto-Lock (Prevent Reset)", Default = false, Callback = function(v) Config.LockSpeed = v end })
 
-Tabs.Main:AddSection("World Teleport")
-Tabs.Main:AddButton({
-    Title = "Teleport to World 3",
-    Description = "Teleport directly using Place ID (93411036959889)",
-    Callback = function()
-        game:GetService("TeleportService"):Teleport(93411036959889, game.Players.LocalPlayer)
-    end
-})
-
 -- TABS: Treadmills
 Tabs.Treadmills:AddToggle("SmartTreadmill", { Title = "Auto Best Available Treadmill", Default = false, Callback = function(v) Config.SmartTreadmill = v end })
 Tabs.Treadmills:AddDropdown("SelectedTreadmill", {
@@ -88,17 +76,21 @@ Tabs.Shop:AddToggle("AutoBuySecret", { Title = "Auto Buy Secret Skins (Limit 1B)
 Tabs.Shop:AddToggle("AutoBuyMythic", { Title = "Auto Buy Mythic Skins (Limit 300M)", Default = false, Callback = function(v) Config.AutoBuyMythic = v end })
 Tabs.Shop:AddToggle("AutoEquipBest", { Title = "Auto Equip Best Skin", Default = false, Callback = function(v) Config.AutoEquipBest = v end })
 
--- TABS: Performance & Settings
+-- TABS: Performance & Settings (Smooth Async Fix)
 Tabs.Settings:AddToggle("LowGraphics", { Title = "Super Low Graphics", Default = false, Callback = function(v)
     Config.LowGraphics = v
     if v then
-        for _, obj in pairs(game:GetDescendants()) do
-            if obj:IsA("BasePart") then
-                obj.Material = Enum.Material.SmoothPlastic
-            elseif obj:IsA("Decal") or obj:IsA("Texture") then
-                obj:Destroy()
-            end
-        end
+        task.spawn(function()
+            pcall(function()
+                for _, obj in ipairs(game:GetDescendants()) do
+                    if obj:IsA("BasePart") then
+                        obj.Material = Enum.Material.SmoothPlastic
+                    elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                        obj:Destroy()
+                    end
+                end
+            end)
+        end)
     end
 end })
 
@@ -106,30 +98,32 @@ local BlackScreenGui = nil
 Tabs.Settings:AddToggle("BlackScreen", { Title = "Black Screen Mode (Battery & CPU Saver)", Default = false, Callback = function(v)
     Config.BlackScreen = v
     if v then
-        BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
-        local Frame = Instance.new("Frame", BlackScreenGui)
-        Frame.Size = UDim2.new(1, 0, 1, 0)
-        Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+        task.spawn(function()
+            BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
+            local Frame = Instance.new("Frame", BlackScreenGui)
+            Frame.Size = UDim2.new(1, 0, 1, 0)
+            Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+        end)
     elseif BlackScreenGui then
         BlackScreenGui:Destroy()
+        BlackScreenGui = nil
     end
-end })
-
-Tabs.Settings:AddToggle("LowFPS", { Title = "Low FPS AFK Mode (30 FPS)", Default = false, Callback = function(v)
-    Config.LowFPS = v
-    setfpscap(v and 30 or 60)
 end })
 
 Tabs.Settings:AddToggle("GhostMode", { Title = "Ghost Mode (Hide Character)", Default = false, Callback = function(v)
     Config.GhostMode = v
-    local char = game.Players.LocalPlayer.Character
-    if char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Transparency = v and 1 or 0
+    task.spawn(function()
+        pcall(function()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                for _, part in ipairs(char:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Transparency = v and 1 or 0
+                    end
+                end
             end
-        end
-    end
+        end)
+    end)
 end })
 
 Tabs.Settings:AddToggle("AntiAFK", { Title = "Anti-AFK Protection", Default = true, Callback = function(v) Config.AntiAFK = v end })
