@@ -1,84 +1,21 @@
--- Ultimate Speed Script Hub / Rayfield UI (Multi-Language: Arabic & English)
+-- Ultimate Speed Script Hub / Rayfield UI (Arabic & English Built-in)
 
 local CustomImageID = "rbxassetid://76030535720323" 
 
--- Language Translations Setup
-local Translations = {
-    AR = {
-        WindowTitle = "سكربت السرعة | تطوير سجاد",
-        LoadingTitle = "جاري تحميل السكربت...",
-        LoadingSubtitle = "من تطوير سجاد",
-        TabMain = "التلقائي الرئيسي",
-        TabTreadmills = "أجهزة المشي",
-        TabShop = "المتجر والسكنات",
-        TabSettings = "الإعدادات والإعادة",
-        
-        AutoWinTP = "فوز تلقائي (انتقال سريع)",
-        AutoWinWalk = "فوز تلقائي (مشي تلقائي)",
-        SpeedBasedWins = "فوز حسب السرعة (دفع بأقصى سرعة)",
-        RebirthSection = "الريبيرث والسرعة",
-        AutoRebirth = "ريبيرث تلقائي",
-        LockSpeed = "قفل السرعة (منع الرست)",
-        
-        SmartTreadmill = "أفضل سير متاح مجاناً",
-        SelectTreadmill = "اختيار السير يدوياً",
-        
-        AutoBuySecret = "شراء سكنات السيكرت (حد 1B)",
-        AutoBuyMythic = "شراء سكنات الميثيك (حد 300M)",
-        AutoEquipBest = "تجهيز أفضل سكن تلقائياً",
-        
-        ConnSection = "خيارات الاتصال التلقائي",
-        AutoRejoin = "إعادة دخول عند الانقطاع",
-        AutoServerHop = "إعادة دخول / تنقل كل ساعة",
-        RejoinNow = "إعادة دخول فورية الآن",
-        PerfSection = "الأداء والسرعة",
-        LowGraphics = "تقليل الجودة (تخفيف اللاغ)",
-        BlackScreen = "وضع الشاشة السوداء (توفير البطارية)",
-        GhostMode = "وضع الشبح (إخفاء الشخصية)",
-        AntiAFK = "حماية من الطرد (Anti-AFK)",
-        
-        NotifyTitle = "Sajjad Script Hub",
-        NotifyContent = "تم تشغيل السكربت بنجاح!",
-        LangPromptTitle = "اختر اللغة / Select Language"
-    },
-    EN = {
-        WindowTitle = "Ultimate Speed Hub | by Sajjad",
-        LoadingTitle = "Loading Script...",
-        LoadingSubtitle = "Developed by Sajjad",
-        TabMain = "Main Auto",
-        TabTreadmills = "Treadmills",
-        TabShop = "Shop & Skins",
-        TabSettings = "Settings & Rejoin",
-        
-        AutoWinTP = "Auto Win (Teleport)",
-        AutoWinWalk = "Auto Win (Auto Walk)",
-        SpeedBasedWins = "Speed-Based Wins (Max Push)",
-        RebirthSection = "Rebirth & Speed",
-        AutoRebirth = "Auto Rebirth",
-        LockSpeed = "Speed Auto-Lock (Prevent Reset)",
-        
-        SmartTreadmill = "Auto Best Available Treadmill",
-        SelectTreadmill = "Select Treadmill Manually",
-        
-        AutoBuySecret = "Auto Buy Secret Skins (Limit 1B)",
-        AutoBuyMythic = "Auto Buy Mythic Skins (Limit 300M)",
-        AutoEquipBest = "Auto Equip Best Skin",
-        
-        ConnSection = "Auto Connection Options",
-        AutoRejoin = "Auto Rejoin on Disconnect",
-        AutoServerHop = "Auto Rejoin / Hop Every 1 Hour",
-        RejoinNow = "Rejoin Current Server Now",
-        PerfSection = "Performance",
-        LowGraphics = "Super Low Graphics",
-        BlackScreen = "Black Screen Mode (Battery Saver)",
-        GhostMode = "Ghost Mode (Hide Character)",
-        AntiAFK = "Anti-AFK Protection",
-        
-        NotifyTitle = "Sajjad Script Hub",
-        NotifyContent = "Script loaded successfully!",
-        LangPromptTitle = "Select Language"
-    }
-}
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Ultimate Speed Script Hub | by Sajjad",
+   LoadingTitle = "جاري تحميل السكربت...",
+   LoadingSubtitle = "من تطوير سجاد",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "SajjadHub",
+      FileName = "SpeedSimConfig"
+   },
+   Discord = { Enabled = false },
+   KeySystem = false
+})
 
 -- State Variables
 local Config = {
@@ -111,308 +48,215 @@ local TreadmillList = {
     "150x Admin Treadmill"
 }
 
--- FUNCTION TO INITIALIZE FULL HUB IN SELECTED LANGUAGE
-local function LoadMainHub(lang)
-    local L = Translations[lang]
-    
-    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- TABS
+local MainTab = Window:CreateTab("Main Auto (الرئيسي)", CustomImageID)
+local TreadmillsTab = Window:CreateTab("Treadmills (أجهزة المشي)", CustomImageID)
+local ShopTab = Window:CreateTab("Shop & Skins (المتجر)", CustomImageID)
+local SettingsTab = Window:CreateTab("Settings (الإعدادات)", CustomImageID)
 
-    local Window = Rayfield:CreateWindow({
-       Name = L.WindowTitle,
-       LoadingTitle = L.LoadingTitle,
-       LoadingSubtitle = L.LoadingSubtitle,
-       ConfigurationSaving = {
-          Enabled = true,
-          FolderName = "SajjadHub",
-          FileName = "SpeedSimConfig"
-       },
-       Discord = { Enabled = false },
-       KeySystem = false
-    })
+-- MAIN TAB TOGGLES
+MainTab:CreateToggle({
+   Name = "Auto Win (Teleport) | فوز تلقائي",
+   CurrentValue = false,
+   Flag = "AutoWinTP",
+   Callback = function(Value) Config.AutoWinTP = Value end,
+})
 
-    -- TABS
-    local MainTab = Window:CreateTab(L.TabMain, CustomImageID)
-    local TreadmillsTab = Window:CreateTab(L.TabTreadmills, CustomImageID)
-    local ShopTab = Window:CreateTab(L.TabShop, CustomImageID)
-    local SettingsTab = Window:CreateTab(L.TabSettings, CustomImageID)
+MainTab:CreateToggle({
+   Name = "Auto Win (Auto Walk) | مشي تلقائي",
+   CurrentValue = false,
+   Flag = "AutoWinWalk",
+   Callback = function(Value) Config.AutoWinWalk = Value end,
+})
 
-    -- MAIN TAB TOGGLES
-    MainTab:CreateToggle({
-       Name = L.AutoWinTP,
-       CurrentValue = false,
-       Flag = "AutoWinTP",
-       Callback = function(Value) Config.AutoWinTP = Value end,
-    })
+MainTab:CreateToggle({
+   Name = "Speed-Based Wins | فوز بأقصى سرعة",
+   CurrentValue = false,
+   Flag = "SpeedBasedWins",
+   Callback = function(Value) Config.SpeedBasedWins = Value end,
+})
 
-    MainTab:CreateToggle({
-       Name = L.AutoWinWalk,
-       CurrentValue = false,
-       Flag = "AutoWinWalk",
-       Callback = function(Value) Config.AutoWinWalk = Value end,
-    })
+MainTab:CreateSection("Rebirth & Speed | الريبيرث والسرعة")
 
-    MainTab:CreateToggle({
-       Name = L.SpeedBasedWins,
-       CurrentValue = false,
-       Flag = "SpeedBasedWins",
-       Callback = function(Value) Config.SpeedBasedWins = Value end,
-    })
+MainTab:CreateToggle({
+   Name = "Auto Rebirth | ريبيرث تلقائي",
+   CurrentValue = false,
+   Flag = "AutoRebirth",
+   Callback = function(Value) Config.AutoRebirth = Value end,
+})
 
-    MainTab:CreateSection(L.RebirthSection)
+MainTab:CreateToggle({
+   Name = "Speed Auto-Lock | قفل السرعة",
+   CurrentValue = false,
+   Flag = "LockSpeed",
+   Callback = function(Value) Config.LockSpeed = Value end,
+})
 
-    MainTab:CreateToggle({
-       Name = L.AutoRebirth,
-       CurrentValue = false,
-       Flag = "AutoRebirth",
-       Callback = function(Value) Config.AutoRebirth = Value end,
-    })
+-- TREADMILLS TAB TOGGLES
+TreadmillsTab:CreateToggle({
+   Name = "Auto Best Treadmill | أفضل سير مجاني",
+   CurrentValue = false,
+   Flag = "SmartTreadmill",
+   Callback = function(Value) Config.SmartTreadmill = Value end,
+})
 
-    MainTab:CreateToggle({
-       Name = L.LockSpeed,
-       CurrentValue = false,
-       Flag = "LockSpeed",
-       Callback = function(Value) Config.LockSpeed = Value end,
-    })
+TreadmillsTab:CreateDropdown({
+   Name = "Select Treadmill Manually | اختيار سير محدد",
+   Options = TreadmillList,
+   CurrentOption = {"Free Treadmill"},
+   MultipleOptions = false,
+   Flag = "SelectedTreadmill",
+   Callback = function(Option) Config.SelectedTreadmill = Option[1] end,
+})
 
-    -- TREADMILLS TAB TOGGLES
-    TreadmillsTab:CreateToggle({
-       Name = L.SmartTreadmill,
-       CurrentValue = false,
-       Flag = "SmartTreadmill",
-       Callback = function(Value) Config.SmartTreadmill = Value end,
-    })
+-- SHOP TAB TOGGLES
+ShopTab:CreateToggle({
+   Name = "Auto Buy Secret Skins | شراء سيكرت (1B)",
+   CurrentValue = false,
+   Flag = "AutoBuySecret",
+   Callback = function(Value) Config.AutoBuySecret = Value end,
+})
 
-    TreadmillsTab:CreateDropdown({
-       Name = L.SelectTreadmill,
-       Options = TreadmillList,
-       CurrentOption = {"Free Treadmill"},
-       MultipleOptions = false,
-       Flag = "SelectedTreadmill",
-       Callback = function(Option) Config.SelectedTreadmill = Option[1] end,
-    })
+ShopTab:CreateToggle({
+   Name = "Auto Buy Mythic Skins | شراء ميثيك (300M)",
+   CurrentValue = false,
+   Flag = "AutoBuyMythic",
+   Callback = function(Value) Config.AutoBuyMythic = Value end,
+})
 
-    -- SHOP TAB TOGGLES
-    ShopTab:CreateToggle({
-       Name = L.AutoBuySecret,
-       CurrentValue = false,
-       Flag = "AutoBuySecret",
-       Callback = function(Value) Config.AutoBuySecret = Value end,
-    })
+ShopTab:CreateToggle({
+   Name = "Auto Equip Best Skin | لبس أفضل سكن",
+   CurrentValue = false,
+   Flag = "AutoEquipBest",
+   Callback = function(Value) Config.AutoEquipBest = Value end,
+})
 
-    ShopTab:CreateToggle({
-       Name = L.AutoBuyMythic,
-       CurrentValue = false,
-       Flag = "AutoBuyMythic",
-       Callback = function(Value) Config.AutoBuyMythic = Value end,
-    })
+-- SETTINGS & REJOIN TAB
+SettingsTab:CreateSection("Connection Options | خيارات الاتصال")
 
-    ShopTab:CreateToggle({
-       Name = L.AutoEquipBest,
-       CurrentValue = false,
-       Flag = "AutoEquipBest",
-       Callback = function(Value) Config.AutoEquipBest = Value end,
-    })
+SettingsTab:CreateToggle({
+   Name = "Auto Rejoin on Disconnect | إرجاع تلقائي عند الفصل",
+   CurrentValue = true,
+   Flag = "AutoRejoin",
+   Callback = function(Value) Config.AutoRejoin = Value end,
+})
 
-    -- SETTINGS & REJOIN TAB
-    SettingsTab:CreateSection(L.ConnSection)
+SettingsTab:CreateToggle({
+   Name = "Auto Rejoin Every 1 Hour | تجديد السيرفر كل ساعة",
+   CurrentValue = false,
+   Flag = "AutoServerHopHourly",
+   Callback = function(Value) Config.AutoServerHopHourly = Value end,
+})
 
-    SettingsTab:CreateToggle({
-       Name = L.AutoRejoin,
-       CurrentValue = true,
-       Flag = "AutoRejoin",
-       Callback = function(Value) Config.AutoRejoin = Value end,
-    })
+SettingsTab:CreateButton({
+   Name = "Rejoin Server Now | إعادة دخول فورية",
+   Callback = function()
+       game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+   end,
+})
 
-    SettingsTab:CreateToggle({
-       Name = L.AutoServerHop,
-       CurrentValue = false,
-       Flag = "AutoServerHopHourly",
-       Callback = function(Value) Config.AutoServerHopHourly = Value end,
-    })
+SettingsTab:CreateSection("Performance | الأداء والسرعة")
 
-    SettingsTab:CreateButton({
-       Name = L.RejoinNow,
-       Callback = function()
-           game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-       end,
-    })
-
-    SettingsTab:CreateSection(L.PerfSection)
-
-    SettingsTab:CreateToggle({
-       Name = L.LowGraphics,
-       CurrentValue = false,
-       Flag = "LowGraphics",
-       Callback = function(Value)
-          Config.LowGraphics = Value
-          if Value then
-              task.spawn(function()
-                  pcall(function()
-                      for _, obj in ipairs(game:GetDescendants()) do
-                          if obj:IsA("BasePart") then
-                              obj.Material = Enum.Material.SmoothPlastic
-                          elseif obj:IsA("Decal") or obj:IsA("Texture") then
-                              obj:Destroy()
-                          end
-                      end
-                  end)
-              end)
-          end
-       end,
-    })
-
-    local BlackScreenGui = nil
-    SettingsTab:CreateToggle({
-       Name = L.BlackScreen,
-       CurrentValue = false,
-       Flag = "BlackScreen",
-       Callback = function(Value)
-          Config.BlackScreen = Value
-          if Value then
-              task.spawn(function()
-                  BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
-                  local Frame = Instance.new("Frame", BlackScreenGui)
-                  Frame.Size = UDim2.new(1, 0, 1, 0)
-                  Frame.BackgroundColor3 = Color3.new(0, 0, 0)
-              end)
-          elseif BlackScreenGui then
-              BlackScreenGui:Destroy()
-              BlackScreenGui = nil
-          end
-       end,
-    })
-
-    SettingsTab:CreateToggle({
-       Name = L.GhostMode,
-       CurrentValue = false,
-       Flag = "GhostMode",
-       Callback = function(Value)
-          Config.GhostMode = Value
+SettingsTab:CreateToggle({
+   Name = "Super Low Graphics | تقليل الجودة وتخفيف اللاغ",
+   CurrentValue = false,
+   Flag = "LowGraphics",
+   Callback = function(Value)
+      Config.LowGraphics = Value
+      if Value then
           task.spawn(function()
               pcall(function()
-                  local char = game.Players.LocalPlayer.Character
-                  if char then
-                      for _, part in ipairs(char:GetDescendants()) do
-                          if part:IsA("BasePart") then
-                              part.Transparency = Value and 1 or 0
-                          end
+                  for _, obj in ipairs(game:GetDescendants()) do
+                      if obj:IsA("BasePart") then
+                          obj.Material = Enum.Material.SmoothPlastic
+                      elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                          obj:Destroy()
                       end
                   end
               end)
           end)
-       end,
-    })
+      end
+   end,
+})
 
-    SettingsTab:CreateToggle({
-       Name = L.AntiAFK,
-       CurrentValue = true,
-       Flag = "AntiAFK",
-       Callback = function(Value) Config.AntiAFK = Value end,
-    })
+local BlackScreenGui = nil
+SettingsTab:CreateToggle({
+   Name = "Black Screen Mode | وضع الشاشة السوداء",
+   CurrentValue = false,
+   Flag = "BlackScreen",
+   Callback = function(Value)
+      Config.BlackScreen = Value
+      if Value then
+          task.spawn(function()
+              BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
+              local Frame = Instance.new("Frame", BlackScreenGui)
+              Frame.Size = UDim2.new(1, 0, 1, 0)
+              Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+          end)
+      elseif BlackScreenGui then
+          BlackScreenGui:Destroy()
+          BlackScreenGui = nil
+      end
+   end,
+})
 
-    -- FLOATING CIRCULAR TOGGLE BUTTON
-    local ScreenGui = Instance.new("ScreenGui")
-    local ToggleBtn = Instance.new("ImageButton")
-    local UICorner = Instance.new("UICorner")
+SettingsTab:CreateToggle({
+   Name = "Ghost Mode | وضع الشبح (إخفاء اللاعب)",
+   CurrentValue = false,
+   Flag = "GhostMode",
+   Callback = function(Value)
+      Config.GhostMode = Value
+      task.spawn(function()
+          pcall(function()
+              local char = game.Players.LocalPlayer.Character
+              if char then
+                  for _, part in ipairs(char:GetDescendants()) do
+                      if part:IsA("BasePart") then
+                          part.Transparency = Value and 1 or 0
+                      end
+                  end
+              end
+          end)
+      end)
+   end,
+})
 
-    ScreenGui.Name = "SajjadToggleGui"
-    ScreenGui.Parent = game.CoreGui
-
-    ToggleBtn.Name = "ToggleButton"
-    ToggleBtn.Parent = ScreenGui
-    ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
-    ToggleBtn.Size = UDim2.new(0, 55, 0, 55)
-    ToggleBtn.Image = CustomImageID
-    ToggleBtn.Active = true
-    ToggleBtn.Draggable = true
-
-    UICorner.CornerRadius = UDim.new(1, 0)
-    UICorner.Parent = ToggleBtn
-
-    local uiVisible = true
-    ToggleBtn.MouseButton1Click:Connect(function()
-        uiVisible = not uiVisible
-        if game.CoreGui:FindFirstChild("Rayfield") then
-            game.CoreGui.Rayfield.Enabled = uiVisible
-        end
-    end)
-
-    Rayfield:Notify({
-       Title = L.NotifyTitle,
-       Content = L.NotifyContent,
-       Duration = 5,
-       Image = CustomImageID,
-    })
-end
+SettingsTab:CreateToggle({
+   Name = "Anti-AFK Protection | منع الطرد",
+   CurrentValue = true,
+   Flag = "AntiAFK",
+   Callback = function(Value) Config.AntiAFK = Value end,
+})
 
 -- ========================================================
---              INITIAL LANGUAGE SELECTOR UI
+--              FLOATING CIRCULAR TOGGLE BUTTON
 -- ========================================================
 
-local LangGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local TitleLabel = Instance.new("TextLabel")
-local ArabicBtn = Instance.new("TextButton")
-local EnglishBtn = Instance.new("TextButton")
-local UIFrameCorner = Instance.new("UICorner")
-local UIArCorner = Instance.new("UICorner")
-local UIEnCorner = Instance.new("UICorner")
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleBtn = Instance.new("ImageButton")
+local UICorner = Instance.new("UICorner")
 
-LangGui.Name = "SajjadLangGui"
-LangGui.Parent = game.CoreGui
+ScreenGui.Name = "SajjadToggleGui"
+ScreenGui.Parent = game.CoreGui
 
-MainFrame.Parent = LangGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
-MainFrame.Size = UDim2.new(0, 250, 0, 150)
-MainFrame.Active = true
-MainFrame.Draggable = true
+ToggleBtn.Name = "ToggleButton"
+ToggleBtn.Parent = ScreenGui
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
+ToggleBtn.Size = UDim2.new(0, 55, 0, 55)
+ToggleBtn.Image = CustomImageID
+ToggleBtn.Active = true
+ToggleBtn.Draggable = true
 
-UIFrameCorner.CornerRadius = UDim.new(0, 12)
-UIFrameCorner.Parent = MainFrame
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = ToggleBtn
 
-TitleLabel.Parent = MainFrame
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Position = UDim2.new(0, 0, 0, 10)
-TitleLabel.Size = UDim2.new(1, 0, 0, 30)
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.Text = "اختر اللغة / Select Language"
-TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-TitleLabel.TextSize = 16
-
-ArabicBtn.Parent = MainFrame
-ArabicBtn.BackgroundColor3 = Color3.fromRGB(40, 140, 220)
-ArabicBtn.Position = UDim2.new(0.1, 0, 0.35, 0)
-ArabicBtn.Size = UDim2.new(0.8, 0, 0, 32)
-ArabicBtn.Font = Enum.Font.SourceSansBold
-ArabicBtn.Text = "العربية (Arabic)"
-ArabicBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ArabicBtn.TextSize = 15
-
-UIArCorner.CornerRadius = UDim.new(0, 8)
-UIArCorner.Parent = ArabicBtn
-
-EnglishBtn.Parent = MainFrame
-EnglishBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-EnglishBtn.Position = UDim2.new(0.1, 0, 0.65, 0)
-EnglishBtn.Size = UDim2.new(0.8, 0, 0, 32)
-EnglishBtn.Font = Enum.Font.SourceSansBold
-EnglishBtn.Text = "English"
-EnglishBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-EnglishBtn.TextSize = 15
-
-UIEnCorner.CornerRadius = UDim.new(0, 8)
-UIEnCorner.Parent = EnglishBtn
-
-ArabicBtn.MouseButton1Click:Connect(function()
-    LangGui:Destroy()
-    LoadMainHub("AR")
-end)
-
-EnglishBtn.MouseButton1Click:Connect(function()
-    LangGui:Destroy()
-    LoadMainHub("EN")
+local uiVisible = true
+ToggleBtn.MouseButton1Click:Connect(function()
+    uiVisible = not uiVisible
+    if game.CoreGui:FindFirstChild("Rayfield") then
+        game.CoreGui.Rayfield.Enabled = uiVisible
+    end
 end)
 
 -- ========================================================
@@ -515,3 +359,10 @@ game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(func
         game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
     end
 end)
+
+Rayfield:Notify({
+   Title = "Sajjad Script Hub",
+   Content = "تم التحميل بنجاح مع الدعم المزدوج للغة!",
+   Duration = 5,
+   Image = CustomImageID,
+})
