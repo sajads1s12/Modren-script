@@ -1,7 +1,14 @@
--- Roblox Auto Script / Fluent UI Framework (Optimized for Mobile)
--- Place ID for World 3: 93411036959889
+-- Roblox Auto Script / Fluent UI (Mobile Fixed Version)
 
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Success, Fluent = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/main.lua"))()
+end)
+
+if not Success or not Fluent then
+    -- محاولة استدعاء احتياطية للموبايل في حال فشل الرابط الأول
+    Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+end
+
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/InterfaceManager.lua"))()
 
@@ -76,7 +83,7 @@ Tabs.Shop:AddToggle("AutoBuySecret", { Title = "Auto Buy Secret Skins (Limit 1B)
 Tabs.Shop:AddToggle("AutoBuyMythic", { Title = "Auto Buy Mythic Skins (Limit 300M)", Default = false, Callback = function(v) Config.AutoBuyMythic = v end })
 Tabs.Shop:AddToggle("AutoEquipBest", { Title = "Auto Equip Best Skin", Default = false, Callback = function(v) Config.AutoEquipBest = v end })
 
--- TABS: Performance & Settings (Smooth Async Fix)
+-- TABS: Performance & Settings
 Tabs.Settings:AddToggle("LowGraphics", { Title = "Super Low Graphics", Default = false, Callback = function(v)
     Config.LowGraphics = v
     if v then
@@ -154,4 +161,9 @@ InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
 
 Window:SelectTab(1)
-SaveManager:LoadAutoloadConfig()
+
+Fluent:Notify({
+    Title = "Sajjad Script Hub",
+    Content = "The script loaded successfully!",
+    Duration = 5
+})
