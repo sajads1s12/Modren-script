@@ -1,176 +1,163 @@
--- ==========================================
--- Keyboard Simulator - Sajjad Modern Hub (Rayfield UI)
--- ==========================================
+-- Roblox Auto Script / Fluent UI Framework
+-- Place ID for World 3: 93411036959889
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/InterfaceManager.lua"))()
 
-local Window = Rayfield:CreateWindow({
-   Name = "KEYBOARD HUB | v2.2.0",
-   LoadingTitle = "Sajjad Modern Script",
-   LoadingSubtitle = "by Sajjad",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "SajjadHubConfig",
-      FileName = "KeyboardSimConfig"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "",
-      RememberJoins = true
-   },
-   KeySystem = false -- بدون نظام مفاتيح لسهولة التشغيل
+local Window = Fluent:CreateWindow({
+    Title = "Ultimate Speed Script Hub",
+    SubTitle = "by Sajjad",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
 })
 
--- ==========================================
--- 📌 التبويبات (Tabs)
--- ==========================================
-local MainTab = Window:CreateTab("⚡ Main", 4483362458)
-local BuyTab = Window:CreateTab("🛒 Auto Buy", 4483362458)
-local SettingsTab = Window:CreateTab("⚙️ Settings", 4483362458)
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main Auto", Icon = "play" }),
+    Treadmills = Window:AddTab({ Title = "Treadmills", Icon = "activity" }),
+    Shop = Window:AddTab({ Title = "Shop & Skins", Icon = "shopping-cart" }),
+    Settings = Window:AddTab({ Title = "Performance & Settings", Icon = "settings" })
+}
 
--- ==========================================
--- 🎯 تبويب MAIN (الفوز والتنقل والسرعة)
--- ==========================================
+local Options = Fluent.Options
 
-MainTab:CreateSection("Auto Win Settings")
+-- State Variables
+local Config = {
+    AutoWinTP = false,
+    AutoWinWalk = false,
+    SpeedBasedWins = false,
+    SmartTreadmill = false,
+    SelectedTreadmill = "Free",
+    AutoBuySecret = false,
+    AutoBuyMythic = false,
+    AutoEquipBest = false,
+    AutoRebirth = false,
+    LockSpeed = false,
+    GhostMode = false,
+    LowGraphics = false,
+    BlackScreen = false,
+    LowFPS = false,
+    AntiAFK = true,
+    AutoRejoin = true
+}
 
--- اختيار منصة الفوز / الفلوس (Target Win Block)
-local selectedWinBlock = nil
-local winBlockNames = {}
+-- Treadmill Multipliers List
+local TreadmillList = {
+    "Free Treadmill",
+    "3x Treadmill",
+    "5x Treadmill",
+    "9x Treadmill",
+    "25x Treadmill",
+    "100x Treadmill",
+    "120x Admin Treadmill",
+    "150x Admin Treadmill"
+}
 
--- بحث تلقائي عن منصات الفوز داخل الماب لتغذية القائمة
-for _, v in pairs(workspace:GetDescendants()) do
-    if v:IsA("BasePart") and (v.Name:lower():find("win") or v.Name:lower():find("wb")) then
-        table.insert(winBlockNames, v.Name)
+-- TABS: Main Auto
+Tabs.Main:AddToggle("AutoWinTP", { Title = "Auto Win (Teleport)", Default = false, Callback = function(v) Config.AutoWinTP = v end })
+Tabs.Main:AddToggle("AutoWinWalk", { Title = "Auto Win (Auto Walk)", Default = false, Callback = function(v) Config.AutoWinWalk = v end })
+Tabs.Main:AddToggle("SpeedBasedWins", { Title = "Speed-Based Wins (Max Wins)", Default = false, Callback = function(v) Config.SpeedBasedWins = v end })
+
+Tabs.Main:AddSection("Rebirth & Speed")
+Tabs.Main:AddToggle("AutoRebirth", { Title = "Auto Rebirth (Based on Level)", Default = false, Callback = function(v) Config.AutoRebirth = v end })
+Tabs.Main:AddToggle("LockSpeed", { Title = "Speed Auto-Lock (Prevent Reset)", Default = false, Callback = function(v) Config.LockSpeed = v end })
+
+Tabs.Main:AddSection("World Teleport")
+Tabs.Main:AddButton({
+    Title = "Teleport to World 3",
+    Description = "Teleport directly using Place ID (93411036959889)",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(93411036959889, game.Players.LocalPlayer)
     end
-end
-
-if #winBlockNames == 0 then
-    winBlockNames = {"WB1 (1K)", "WB5 (10K)", "WB14 (50K)", "Auto Highest"}
-end
-
-MainTab:CreateDropdown({
-   Name = "Target Win Block (اختيار كمية الفوز)",
-   Options = winBlockNames,
-   CurrentOption = winBlockNames[1],
-   MultipleOptions = false,
-   Flag = "TargetWinDropdown",
-   Callback = function(Option)
-       selectedWinBlock = Option[1]
-   end,
 })
 
--- زر تفعيل الفوز التلقائي (Auto Win - Tween/Walk)
-local autoWinActive = false
-MainTab:CreateToggle({
-   Name = "Auto Win (Smart Walk / Teleport)",
-   CurrentValue = false,
-   Flag = "AutoWinToggle",
-   Callback = function(Value)
-      autoWinActive = Value
-      task.spawn(function()
-          while autoWinActive do
-              pcall(function()
-                  local char = game.Players.LocalPlayer.Character
-                  if char and char:FindFirstChild("HumanoidRootPart") then
-                      -- البحث عن المنصة المحددة ونقل اللاعب إليها
-                      for _, obj in pairs(workspace:GetDescendants()) do
-                          if not autoWinActive then break end
-                          if obj:IsA("BasePart") and (obj.Name == selectedWinBlock or obj.Name:lower():find("win")) then
-                              char.HumanoidRootPart.CFrame = obj.CFrame + Vector3.new(0, 3, 0)
-                              task.wait(0.2)
-                          end
-                      end
-                  end
-              end)
-              task.wait(0.5)
-          end
-      end)
-   end,
+-- TABS: Treadmills
+Tabs.Treadmills:AddToggle("SmartTreadmill", { Title = "Auto Best Available Treadmill", Default = false, Callback = function(v) Config.SmartTreadmill = v end })
+Tabs.Treadmills:AddDropdown("SelectedTreadmill", {
+    Title = "Select Treadmill Manually",
+    Values = TreadmillList,
+    Default = 1,
+    Callback = function(v) Config.SelectedTreadmill = v end
 })
 
-MainTab:CreateSection("Speed Control")
+-- TABS: Shop & Skins
+Tabs.Shop:AddToggle("AutoBuySecret", { Title = "Auto Buy Secret Skins (Limit 1B)", Default = false, Callback = function(v) Config.AutoBuySecret = v end })
+Tabs.Shop:AddToggle("AutoBuyMythic", { Title = "Auto Buy Mythic Skins (Limit 300M)", Default = false, Callback = function(v) Config.AutoBuyMythic = v end })
+Tabs.Shop:AddToggle("AutoEquipBest", { Title = "Auto Equip Best Skin", Default = false, Callback = function(v) Config.AutoEquipBest = v end })
 
--- سرعة المشي المخصصة
-MainTab:CreateSlider({
-   Name = "Travel Speed (السرعة المخصصة)",
-   Range = {16, 500},
-   Increment = 5,
-   Suffix = " Speed",
-   CurrentValue = 100,
-   Flag = "SpeedSlider",
-   Callback = function(Value)
-       pcall(function()
-           if game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
-               game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-           end
-       end)
-   end,
-})
+-- TABS: Performance & Settings
+Tabs.Settings:AddToggle("LowGraphics", { Title = "Super Low Graphics", Default = false, Callback = function(v)
+    Config.LowGraphics = v
+    if v then
+        for _, obj in pairs(game:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.SmoothPlastic
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj:Destroy()
+            end
+        end
+    end
+end })
 
--- Smart Speed (السرعة القصوى تلقائياً)
-local smartSpeed = false
-MainTab:CreateToggle({
-   Name = "Smart Speed (Max Owned)",
-   CurrentValue = false,
-   Flag = "SmartSpeedToggle",
-   Callback = function(Value)
-       smartSpeed = Value
-       task.spawn(function()
-           while smartSpeed do
-               pcall(function()
-                   local player = game.Players.LocalPlayer
-                   local char = player.Character
-                   if char and char:FindFirstChild("Humanoid") then
-                       char.Humanoid.WalkSpeed = 350 -- يضبط أقصى سرعة
-                   end
-               end)
-               task.wait(0.5)
-           end
-       end)
-   end,
-})
+local BlackScreenGui = nil
+Tabs.Settings:AddToggle("BlackScreen", { Title = "Black Screen Mode (Battery & CPU Saver)", Default = false, Callback = function(v)
+    Config.BlackScreen = v
+    if v then
+        BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
+        local Frame = Instance.new("Frame", BlackScreenGui)
+        Frame.Size = UDim2.new(1, 0, 1, 0)
+        Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+    elseif BlackScreenGui then
+        BlackScreenGui:Destroy()
+    end
+end })
 
--- ==========================================
--- 🛒 تبويب AUTO BUY
--- ==========================================
-BuyTab:CreateSection("Automation")
+Tabs.Settings:AddToggle("LowFPS", { Title = "Low FPS AFK Mode (30 FPS)", Default = false, Callback = function(v)
+    Config.LowFPS = v
+    setfpscap(v and 30 or 60)
+end })
 
-BuyTab:CreateToggle({
-   Name = "Auto Collect Coins",
-   CurrentValue = false,
-   Flag = "AutoCoins",
-   Callback = function(Value)
-       -- كود جمع الكوينز
-   end,
-})
+Tabs.Settings:AddToggle("GhostMode", { Title = "Ghost Mode (Hide Character)", Default = false, Callback = function(v)
+    Config.GhostMode = v
+    local char = game.Players.LocalPlayer.Character
+    if char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Transparency = v and 1 or 0
+            end
+        end
+    end
+end })
 
--- ==========================================
--- ⚙️ تبويب SETTINGS & UTILITY
--- ==========================================
-SettingsTab:CreateSection("Utility")
+Tabs.Settings:AddToggle("AntiAFK", { Title = "Anti-AFK Protection", Default = true, Callback = function(v) Config.AntiAFK = v end })
+Tabs.Settings:AddToggle("AutoRejoin", { Title = "Auto Rejoin on Disconnect", Default = true, Callback = function(v) Config.AutoRejoin = v end })
 
-SettingsTab:CreateToggle({
-   Name = "Clean RAM Hourly / Rejoin",
-   CurrentValue = false,
-   Flag = "CleanRam",
-   Callback = function(Value)
-       if Value then
-           task.spawn(function()
-               task.wait(3600)
-               game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-           end)
-       end
-   end,
-})
+-- Anti-AFK Logic
+local VirtualUser = game:GetService("VirtualUser")
+game.Players.LocalPlayer.Idled:Connect(function()
+    if Config.AntiAFK then
+        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    end
+end)
 
--- زر إخفاء/إظهار الواجهة (Toggle Key)
-SettingsTab:CreateKeybind({
-   Name = "UI Toggle Key (زر إخفاء/فتح القائمة)",
-   CurrentKeybind = "K",
-   HoldToInteract = false,
-   Flag = "UIKeybind",
-   Callback = function(Keybind)
-       Rayfield:Toggle()
-   end,
-})
+-- Auto Rejoin
+game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+    if Config.AutoRejoin and child.Name == "ErrorPrompt" then
+        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    end
+end)
+
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+SaveManager:LoadAutoloadConfig()
