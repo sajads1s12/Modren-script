@@ -1,33 +1,21 @@
--- Roblox Auto Script / Fluent UI (Mobile Fixed Version)
+-- Ultimate Speed Script Hub / Rayfield UI (Mobile Optimized)
 
-local Success, Fluent = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/main.lua"))()
-end)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
-if not Success or not Fluent then
-    -- محاولة استدعاء احتياطية للموبايل في حال فشل الرابط الأول
-    Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-end
-
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/main/Addons/InterfaceManager.lua"))()
-
-local Window = Fluent:CreateWindow({
-    Title = "Ultimate Speed Script Hub",
-    SubTitle = "by Sajjad",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Acrylic = false,
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.LeftControl
+local Window = Rayfield:CreateWindow({
+   Name = "Ultimate Speed Script Hub | by Sajjad",
+   LoadingTitle = "جاري تحميل السكربت...",
+   LoadingSubtitle = "من تطوير سجاد",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "SajjadHub",
+      FileName = "SpeedSimConfig"
+   },
+   Discord = {
+      Enabled = false
+   },
+   KeySystem = false
 })
-
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main Auto", Icon = "play" }),
-    Treadmills = Window:AddTab({ Title = "Treadmills", Icon = "activity" }),
-    Shop = Window:AddTab({ Title = "Shop & Skins", Icon = "shopping-cart" }),
-    Settings = Window:AddTab({ Title = "Performance & Settings", Icon = "settings" })
-}
 
 -- State Variables
 local Config = {
@@ -35,7 +23,7 @@ local Config = {
     AutoWinWalk = false,
     SpeedBasedWins = false,
     SmartTreadmill = false,
-    SelectedTreadmill = "Free",
+    SelectedTreadmill = "Free Treadmill",
     AutoBuySecret = false,
     AutoBuyMythic = false,
     AutoEquipBest = false,
@@ -60,81 +48,167 @@ local TreadmillList = {
     "150x Admin Treadmill"
 }
 
--- TABS: Main Auto
-Tabs.Main:AddToggle("AutoWinTP", { Title = "Auto Win (Teleport)", Default = false, Callback = function(v) Config.AutoWinTP = v end })
-Tabs.Main:AddToggle("AutoWinWalk", { Title = "Auto Win (Auto Walk)", Default = false, Callback = function(v) Config.AutoWinWalk = v end })
-Tabs.Main:AddToggle("SpeedBasedWins", { Title = "Speed-Based Wins (Max Wins)", Default = false, Callback = function(v) Config.SpeedBasedWins = v end })
+-- TABS
+local MainTab = Window:CreateTab("Main Auto", 4483362458)
+local TreadmillsTab = Window:CreateTab("Treadmills", 4483362458)
+local ShopTab = Window:CreateTab("Shop & Skins", 4483362458)
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
 
-Tabs.Main:AddSection("Rebirth & Speed")
-Tabs.Main:AddToggle("AutoRebirth", { Title = "Auto Rebirth (Based on Level)", Default = false, Callback = function(v) Config.AutoRebirth = v end })
-Tabs.Main:AddToggle("LockSpeed", { Title = "Speed Auto-Lock (Prevent Reset)", Default = false, Callback = function(v) Config.LockSpeed = v end })
-
--- TABS: Treadmills
-Tabs.Treadmills:AddToggle("SmartTreadmill", { Title = "Auto Best Available Treadmill", Default = false, Callback = function(v) Config.SmartTreadmill = v end })
-Tabs.Treadmills:AddDropdown("SelectedTreadmill", {
-    Title = "Select Treadmill Manually",
-    Values = TreadmillList,
-    Default = 1,
-    Callback = function(v) Config.SelectedTreadmill = v end
+-- MAIN TAB
+MainTab:CreateToggle({
+   Name = "Auto Win (Teleport)",
+   CurrentValue = false,
+   Flag = "AutoWinTP",
+   Callback = function(Value) Config.AutoWinTP = Value end,
 })
 
--- TABS: Shop & Skins
-Tabs.Shop:AddToggle("AutoBuySecret", { Title = "Auto Buy Secret Skins (Limit 1B)", Default = false, Callback = function(v) Config.AutoBuySecret = v end })
-Tabs.Shop:AddToggle("AutoBuyMythic", { Title = "Auto Buy Mythic Skins (Limit 300M)", Default = false, Callback = function(v) Config.AutoBuyMythic = v end })
-Tabs.Shop:AddToggle("AutoEquipBest", { Title = "Auto Equip Best Skin", Default = false, Callback = function(v) Config.AutoEquipBest = v end })
+MainTab:CreateToggle({
+   Name = "Auto Win (Auto Walk)",
+   CurrentValue = false,
+   Flag = "AutoWinWalk",
+   Callback = function(Value) Config.AutoWinWalk = Value end,
+})
 
--- TABS: Performance & Settings
-Tabs.Settings:AddToggle("LowGraphics", { Title = "Super Low Graphics", Default = false, Callback = function(v)
-    Config.LowGraphics = v
-    if v then
-        task.spawn(function()
-            pcall(function()
-                for _, obj in ipairs(game:GetDescendants()) do
-                    if obj:IsA("BasePart") then
-                        obj.Material = Enum.Material.SmoothPlastic
-                    elseif obj:IsA("Decal") or obj:IsA("Texture") then
-                        obj:Destroy()
-                    end
-                end
-            end)
-        end)
-    end
-end })
+MainTab:CreateToggle({
+   Name = "Speed-Based Wins (Max Wins)",
+   CurrentValue = false,
+   Flag = "SpeedBasedWins",
+   Callback = function(Value) Config.SpeedBasedWins = Value end,
+})
+
+MainTab:CreateSection("Rebirth & Speed")
+
+MainTab:CreateToggle({
+   Name = "Auto Rebirth (Based on Level)",
+   CurrentValue = false,
+   Flag = "AutoRebirth",
+   Callback = function(Value) Config.AutoRebirth = Value end,
+})
+
+MainTab:CreateToggle({
+   Name = "Speed Auto-Lock (Prevent Reset)",
+   CurrentValue = false,
+   Flag = "LockSpeed",
+   Callback = function(Value) Config.LockSpeed = Value end,
+})
+
+-- TREADMILLS TAB
+TreadmillsTab:CreateToggle({
+   Name = "Auto Best Available Treadmill",
+   CurrentValue = false,
+   Flag = "SmartTreadmill",
+   Callback = function(Value) Config.SmartTreadmill = Value end,
+})
+
+TreadmillsTab:CreateDropdown({
+   Name = "Select Treadmill Manually",
+   Options = TreadmillList,
+   CurrentOption = {"Free Treadmill"},
+   MultipleOptions = false,
+   Flag = "SelectedTreadmill",
+   Callback = function(Option) Config.SelectedTreadmill = Option[1] end,
+})
+
+-- SHOP TAB
+ShopTab:CreateToggle({
+   Name = "Auto Buy Secret Skins (Limit 1B)",
+   CurrentValue = false,
+   Flag = "AutoBuySecret",
+   Callback = function(Value) Config.AutoBuySecret = Value end,
+})
+
+ShopTab:CreateToggle({
+   Name = "Auto Buy Mythic Skins (Limit 300M)",
+   CurrentValue = false,
+   Flag = "AutoBuyMythic",
+   Callback = function(Value) Config.AutoBuyMythic = Value end,
+})
+
+ShopTab:CreateToggle({
+   Name = "Auto Equip Best Skin",
+   CurrentValue = false,
+   Flag = "AutoEquipBest",
+   Callback = function(Value) Config.AutoEquipBest = Value end,
+})
+
+-- SETTINGS TAB
+SettingsTab:CreateToggle({
+   Name = "Super Low Graphics",
+   CurrentValue = false,
+   Flag = "LowGraphics",
+   Callback = function(Value)
+      Config.LowGraphics = Value
+      if Value then
+          task.spawn(function()
+              pcall(function()
+                  for _, obj in ipairs(game:GetDescendants()) do
+                      if obj:IsA("BasePart") then
+                          obj.Material = Enum.Material.SmoothPlastic
+                      elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                          obj:Destroy()
+                      end
+                  end
+              end)
+          end)
+      end
+   end,
+})
 
 local BlackScreenGui = nil
-Tabs.Settings:AddToggle("BlackScreen", { Title = "Black Screen Mode (Battery & CPU Saver)", Default = false, Callback = function(v)
-    Config.BlackScreen = v
-    if v then
-        task.spawn(function()
-            BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
-            local Frame = Instance.new("Frame", BlackScreenGui)
-            Frame.Size = UDim2.new(1, 0, 1, 0)
-            Frame.BackgroundColor3 = Color3.new(0, 0, 0)
-        end)
-    elseif BlackScreenGui then
-        BlackScreenGui:Destroy()
-        BlackScreenGui = nil
-    end
-end })
+SettingsTab:CreateToggle({
+   Name = "Black Screen Mode (Battery Saver)",
+   CurrentValue = false,
+   Flag = "BlackScreen",
+   Callback = function(Value)
+      Config.BlackScreen = Value
+      if Value then
+          task.spawn(function()
+              BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
+              local Frame = Instance.new("Frame", BlackScreenGui)
+              Frame.Size = UDim2.new(1, 0, 1, 0)
+              Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+          end)
+      elseif BlackScreenGui then
+          BlackScreenGui:Destroy()
+          BlackScreenGui = nil
+      end
+   end,
+})
 
-Tabs.Settings:AddToggle("GhostMode", { Title = "Ghost Mode (Hide Character)", Default = false, Callback = function(v)
-    Config.GhostMode = v
-    task.spawn(function()
-        pcall(function()
-            local char = game.Players.LocalPlayer.Character
-            if char then
-                for _, part in ipairs(char:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.Transparency = v and 1 or 0
-                    end
-                end
-            end
-        end)
-    end)
-end })
+SettingsTab:CreateToggle({
+   Name = "Ghost Mode (Hide Character)",
+   CurrentValue = false,
+   Flag = "GhostMode",
+   Callback = function(Value)
+      Config.GhostMode = Value
+      task.spawn(function()
+          pcall(function()
+              local char = game.Players.LocalPlayer.Character
+              if char then
+                  for _, part in ipairs(char:GetDescendants()) do
+                      if part:IsA("BasePart") then
+                          part.Transparency = Value and 1 or 0
+                      end
+                  end
+              end
+          end)
+      end)
+   end,
+})
 
-Tabs.Settings:AddToggle("AntiAFK", { Title = "Anti-AFK Protection", Default = true, Callback = function(v) Config.AntiAFK = v end })
-Tabs.Settings:AddToggle("AutoRejoin", { Title = "Auto Rejoin on Disconnect", Default = true, Callback = function(v) Config.AutoRejoin = v end })
+SettingsTab:CreateToggle({
+   Name = "Anti-AFK Protection",
+   CurrentValue = true,
+   Flag = "AntiAFK",
+   Callback = function(Value) Config.AntiAFK = Value end,
+})
+
+SettingsTab:CreateToggle({
+   Name = "Auto Rejoin on Disconnect",
+   CurrentValue = true,
+   Flag = "AutoRejoin",
+   Callback = function(Value) Config.AutoRejoin = Value end,
+})
 
 -- Anti-AFK Logic
 local VirtualUser = game:GetService("VirtualUser")
@@ -153,17 +227,9 @@ game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(func
     end
 end)
 
-SaveManager:SetLibrary(Fluent)
-InterfaceManager:SetLibrary(Fluent)
-SaveManager:IgnoreThemeSettings()
-SaveManager:SetIgnoreIndexes({})
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-SaveManager:BuildConfigSection(Tabs.Settings)
-
-Window:SelectTab(1)
-
-Fluent:Notify({
-    Title = "Sajjad Script Hub",
-    Content = "The script loaded successfully!",
-    Duration = 5
+Rayfield:Notify({
+   Title = "Sajjad Script Hub",
+   Content = "تم تشغيل واجهة Rayfield بنجاح!",
+   Duration = 5,
+   Image = 4483362458,
 })
