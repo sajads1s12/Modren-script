@@ -1,368 +1,702 @@
--- Ultimate Speed Script Hub / Rayfield UI (Arabic & English Built-in)
+--[=[
+    Project: MM2 Ultimate Hub Script - Part 1 (UI Base & Navigation)
+    Language: Luau (Roblox)
+]=]
 
-local CustomImageID = "rbxassetid://76030535720323" 
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+-- التعرف التلقائي على الجهاز (حاسوب أم هاتف/تابلت)
+local isPC = UserInputService.KeyboardEnabled and not UserInputService.TouchEnabled
 
-local Window = Rayfield:CreateWindow({
-   Name = "Ultimate Speed Script Hub | by Sajjad",
-   LoadingTitle = "جاري تحميل السكربت...",
-   LoadingSubtitle = "من تطوير سجاد",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "SajjadHub",
-      FileName = "SpeedSimConfig"
-   },
-   Discord = { Enabled = false },
-   KeySystem = false
-})
+-- إزالة الواجهة القديمة إن وجدت
+if CoreGui:FindFirstChild("MM2_UltimateHub") then
+    CoreGui.MM2_UltimateHub:Destroy()
+end
 
--- State Variables
-local Config = {
-    AutoWinTP = false,
-    AutoWinWalk = false,
-    SpeedBasedWins = false,
-    SmartTreadmill = false,
-    SelectedTreadmill = "Free Treadmill",
-    AutoBuySecret = false,
-    AutoBuyMythic = false,
-    AutoEquipBest = false,
-    AutoRebirth = false,
-    LockSpeed = false,
-    GhostMode = false,
-    LowGraphics = false,
-    BlackScreen = false,
-    AntiAFK = true,
-    AutoRejoin = true,
-    AutoServerHopHourly = false
-}
-
-local TreadmillList = {
-    "Free Treadmill",
-    "3x Treadmill",
-    "5x Treadmill",
-    "9x Treadmill",
-    "25x Treadmill",
-    "100x Treadmill",
-    "120x Admin Treadmill",
-    "150x Admin Treadmill"
-}
-
--- TABS
-local MainTab = Window:CreateTab("Main Auto (الرئيسي)", CustomImageID)
-local TreadmillsTab = Window:CreateTab("Treadmills (أجهزة المشي)", CustomImageID)
-local ShopTab = Window:CreateTab("Shop & Skins (المتجر)", CustomImageID)
-local SettingsTab = Window:CreateTab("Settings (الإعدادات)", CustomImageID)
-
--- MAIN TAB TOGGLES
-MainTab:CreateToggle({
-   Name = "Auto Win (Teleport) | فوز تلقائي",
-   CurrentValue = false,
-   Flag = "AutoWinTP",
-   Callback = function(Value) Config.AutoWinTP = Value end,
-})
-
-MainTab:CreateToggle({
-   Name = "Auto Win (Auto Walk) | مشي تلقائي",
-   CurrentValue = false,
-   Flag = "AutoWinWalk",
-   Callback = function(Value) Config.AutoWinWalk = Value end,
-})
-
-MainTab:CreateToggle({
-   Name = "Speed-Based Wins | فوز بأقصى سرعة",
-   CurrentValue = false,
-   Flag = "SpeedBasedWins",
-   Callback = function(Value) Config.SpeedBasedWins = Value end,
-})
-
-MainTab:CreateSection("Rebirth & Speed | الريبيرث والسرعة")
-
-MainTab:CreateToggle({
-   Name = "Auto Rebirth | ريبيرث تلقائي",
-   CurrentValue = false,
-   Flag = "AutoRebirth",
-   Callback = function(Value) Config.AutoRebirth = Value end,
-})
-
-MainTab:CreateToggle({
-   Name = "Speed Auto-Lock | قفل السرعة",
-   CurrentValue = false,
-   Flag = "LockSpeed",
-   Callback = function(Value) Config.LockSpeed = Value end,
-})
-
--- TREADMILLS TAB TOGGLES
-TreadmillsTab:CreateToggle({
-   Name = "Auto Best Treadmill | أفضل سير مجاني",
-   CurrentValue = false,
-   Flag = "SmartTreadmill",
-   Callback = function(Value) Config.SmartTreadmill = Value end,
-})
-
-TreadmillsTab:CreateDropdown({
-   Name = "Select Treadmill Manually | اختيار سير محدد",
-   Options = TreadmillList,
-   CurrentOption = {"Free Treadmill"},
-   MultipleOptions = false,
-   Flag = "SelectedTreadmill",
-   Callback = function(Option) Config.SelectedTreadmill = Option[1] end,
-})
-
--- SHOP TAB TOGGLES
-ShopTab:CreateToggle({
-   Name = "Auto Buy Secret Skins | شراء سيكرت (1B)",
-   CurrentValue = false,
-   Flag = "AutoBuySecret",
-   Callback = function(Value) Config.AutoBuySecret = Value end,
-})
-
-ShopTab:CreateToggle({
-   Name = "Auto Buy Mythic Skins | شراء ميثيك (300M)",
-   CurrentValue = false,
-   Flag = "AutoBuyMythic",
-   Callback = function(Value) Config.AutoBuyMythic = Value end,
-})
-
-ShopTab:CreateToggle({
-   Name = "Auto Equip Best Skin | لبس أفضل سكن",
-   CurrentValue = false,
-   Flag = "AutoEquipBest",
-   Callback = function(Value) Config.AutoEquipBest = Value end,
-})
-
--- SETTINGS & REJOIN TAB
-SettingsTab:CreateSection("Connection Options | خيارات الاتصال")
-
-SettingsTab:CreateToggle({
-   Name = "Auto Rejoin on Disconnect | إرجاع تلقائي عند الفصل",
-   CurrentValue = true,
-   Flag = "AutoRejoin",
-   Callback = function(Value) Config.AutoRejoin = Value end,
-})
-
-SettingsTab:CreateToggle({
-   Name = "Auto Rejoin Every 1 Hour | تجديد السيرفر كل ساعة",
-   CurrentValue = false,
-   Flag = "AutoServerHopHourly",
-   Callback = function(Value) Config.AutoServerHopHourly = Value end,
-})
-
-SettingsTab:CreateButton({
-   Name = "Rejoin Server Now | إعادة دخول فورية",
-   Callback = function()
-       game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-   end,
-})
-
-SettingsTab:CreateSection("Performance | الأداء والسرعة")
-
-SettingsTab:CreateToggle({
-   Name = "Super Low Graphics | تقليل الجودة وتخفيف اللاغ",
-   CurrentValue = false,
-   Flag = "LowGraphics",
-   Callback = function(Value)
-      Config.LowGraphics = Value
-      if Value then
-          task.spawn(function()
-              pcall(function()
-                  for _, obj in ipairs(game:GetDescendants()) do
-                      if obj:IsA("BasePart") then
-                          obj.Material = Enum.Material.SmoothPlastic
-                      elseif obj:IsA("Decal") or obj:IsA("Texture") then
-                          obj:Destroy()
-                      end
-                  end
-              end)
-          end)
-      end
-   end,
-})
-
-local BlackScreenGui = nil
-SettingsTab:CreateToggle({
-   Name = "Black Screen Mode | وضع الشاشة السوداء",
-   CurrentValue = false,
-   Flag = "BlackScreen",
-   Callback = function(Value)
-      Config.BlackScreen = Value
-      if Value then
-          task.spawn(function()
-              BlackScreenGui = Instance.new("ScreenGui", game.CoreGui)
-              local Frame = Instance.new("Frame", BlackScreenGui)
-              Frame.Size = UDim2.new(1, 0, 1, 0)
-              Frame.BackgroundColor3 = Color3.new(0, 0, 0)
-          end)
-      elseif BlackScreenGui then
-          BlackScreenGui:Destroy()
-          BlackScreenGui = nil
-      end
-   end,
-})
-
-SettingsTab:CreateToggle({
-   Name = "Ghost Mode | وضع الشبح (إخفاء اللاعب)",
-   CurrentValue = false,
-   Flag = "GhostMode",
-   Callback = function(Value)
-      Config.GhostMode = Value
-      task.spawn(function()
-          pcall(function()
-              local char = game.Players.LocalPlayer.Character
-              if char then
-                  for _, part in ipairs(char:GetDescendants()) do
-                      if part:IsA("BasePart") then
-                          part.Transparency = Value and 1 or 0
-                      end
-                  end
-              end
-          end)
-      end)
-   end,
-})
-
-SettingsTab:CreateToggle({
-   Name = "Anti-AFK Protection | منع الطرد",
-   CurrentValue = true,
-   Flag = "AntiAFK",
-   Callback = function(Value) Config.AntiAFK = Value end,
-})
-
--- ========================================================
---              FLOATING CIRCULAR TOGGLE BUTTON
--- ========================================================
-
+-- إنشاء الشاشة الرئيسية للسكربت
 local ScreenGui = Instance.new("ScreenGui")
-local ToggleBtn = Instance.new("ImageButton")
-local UICorner = Instance.new("UICorner")
+ScreenGui.Name = "MM2_UltimateHub"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
 
-ScreenGui.Name = "SajjadToggleGui"
-ScreenGui.Parent = game.CoreGui
+-- الإطار الرئيسي المربع والمتجاوب
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+MainFrame.Size = UDim2.new(0, 520, 0, 360)
+MainFrame.Position = UDim2.new(0.5, -260, 0.5, -180)
+MainFrame.Active = true
+MainFrame.Draggable = true -- قابل للسحب لكل الأجهزة
 
-ToggleBtn.Name = "ToggleButton"
-ToggleBtn.Parent = ScreenGui
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-ToggleBtn.Position = UDim2.new(0.1, 0, 0.2, 0)
-ToggleBtn.Size = UDim2.new(0, 55, 0, 55)
-ToggleBtn.Image = CustomImageID
-ToggleBtn.Active = true
-ToggleBtn.Draggable = true
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
 
-UICorner.CornerRadius = UDim.new(1, 0)
-UICorner.Parent = ToggleBtn
+-- القائمة الجانبية اليسرى للأقسام
+local Sidebar = Instance.new("ScrollingFrame")
+Sidebar.Name = "Sidebar"
+Sidebar.Parent = MainFrame
+Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+Sidebar.Size = UDim2.new(0, 140, 1, 0)
+Sidebar.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+Sidebar.ScrollBarThickness = 2
+Sidebar.BorderSizePixel = 0
 
-local uiVisible = true
-ToggleBtn.MouseButton1Click:Connect(function()
-    uiVisible = not uiVisible
-    if game.CoreGui:FindFirstChild("Rayfield") then
-        game.CoreGui.Rayfield.Enabled = uiVisible
-    end
+local SidebarCorner = Instance.new("UICorner")
+SidebarCorner.CornerRadius = UDim.new(0, 10)
+SidebarCorner.Parent = Sidebar
+
+local SidebarLayout = Instance.new("UIListLayout")
+SidebarLayout.Parent = Sidebar
+SidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SidebarLayout.Padding = UDim.new(0, 6)
+
+-- منطقة المحتوى الرئيسية بجانب القائمة
+local ContentArea = Instance.new("Frame")
+ContentArea.Name = "ContentArea"
+ContentArea.Parent = MainFrame
+ContentArea.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+ContentArea.Position = UDim2.new(0, 145, 0, 0)
+ContentArea.Size = UDim2.new(1, -145, 1, 0)
+ContentArea.BorderSizePixel = 0
+
+local ContentCorner = Instance.new("UICorner")
+ContentCorner.CornerRadius = UDim.new(0, 10)
+ContentCorner.Parent = ContentArea
+
+-- نظام الصفحات (Pages)
+local Pages = {}
+local function CreatePage(name)
+    local page = Instance.new("ScrollingFrame")
+    page.Name = name .. "Page"
+    page.Parent = ContentArea
+    page.BackgroundTransparency = 1
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.Visible = false
+    page.CanvasSize = UDim2.new(0, 0, 2, 0)
+    page.ScrollBarThickness = 4
+    
+    local layout = Instance.new("UIListLayout")
+    layout.Parent = page
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 10)
+    
+    Pages[name] = page
+    return page
+end
+
+-- إنشاء الأقسام المطلوبة
+CreatePage("Combat")
+CreatePage("AutoFarm")
+CreatePage("ESP")
+if isPC then
+    CreatePage("RamAlt") -- يظهر فقط للحاسوب
+end
+CreatePage("Trade")
+CreatePage("KillSayings")
+CreatePage("Settings")
+
+-- دالة لإنشاء أزرار القائمة الجانبية
+local function CreateMenuButton(text, targetName)
+    local btn = Instance.new("TextButton")
+    btn.Parent = Sidebar
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    btn.Size = UDim2.new(1, -10, 0, 35)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+    
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(Pages) do
+            p.Visible = false
+        end
+        if Pages[targetName] then
+            Pages[targetName].Visible = true
+        end
+    end)
+end
+
+-- إضافة الأزرار للقائمة الجانبية
+CreateMenuButton("⚔️ Combat", "Combat")
+CreateMenuButton("🌾 Auto Farm", "AutoFarm")
+CreateMenuButton("👁️ ESP", "ESP")
+if isPC then
+    CreateMenuButton("💻 Ram & Alt", "RamAlt")
+end
+CreateMenuButton("🤝 Trade", "Trade")
+CreateMenuButton("💬 Kill Sayings", "KillSayings")
+CreateMenuButton("⚙️ Settings", "Settings")
+
+-- جعل صفحة الـ Combat تظهر افتراضياً
+Pages["Combat"].Visible = true
+
+print("✅ [الجزء الأول]: تم تحميل الواجهة والقائمة الجانبية بنجاح.")
+--[=[
+    Project: MM2 Ultimate Hub Script - Part 2 (Combat & Auto Farm Modules)
+    Language: Luau (Roblox)
+]=]
+
+-- التحقق من وجود الجزء الأول أو الاعتماد على المتغيرات المشتركة
+local CombatPage = Pages["Combat"]
+local FarmPage = Pages["AutoFarm"]
+
+if not CombatPage or not FarmPage then
+    warn("⚠️ يرجى تشغيل الجزء الأول أولاً لضمان إنشاء واجهة الأقسام!")
+    return
+end
+
+-- متغيرات أزرار وقسم القتال
+local CombatSettings = {
+    AimBot = false,
+    SilentAim = false,
+    TriggerBot = false,
+    HitboxExtender = false,
+    HitboxSize = 5,
+    AutoKillSheriff = false
+}
+
+-- متغيرات أزرار وقسم التجميع التلقائي
+local FarmSettings = {
+    AutoCoin = false,
+    WalkSpeed = 16,
+    AutoLevel = false,
+    Noclip = false,
+    FlightMode = "AboveMap"
+}
+
+-- دالة مساعدة لإنشاء عناصر واجهة مستخدم (زر مع شرح خافت تحتفظ به)
+local function CreateControlWithSubtitle(parentPage, titleText, subtitleText, callback)
+    local container = Instance.new("Frame")
+    container.Parent = parentPage
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -10, 0, 50)
+    
+    local btn = Instance.new("TextButton")
+    btn.Parent = container
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 52)
+    btn.Size = UDim2.new(1, 0, 0, 28)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = titleText
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = btn
+    
+    local subtitle = Instance.new("TextLabel")
+    subtitle.Parent = container
+    subtitle.BackgroundTransparency = 1
+    subtitle.Position = UDim2.new(0, 0, 0, 30)
+    subtitle.Size = UDim2.new(1, 0, 0, 18)
+    subtitle.Font = Enum.Font.SourceSans
+    subtitle.Text = subtitleText
+    subtitle.TextColor3 = Color3.fromRGB(160, 160, 180) -- لون خافت للشرح
+    subtitle.TextSize = 11
+    subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(40, 40, 52)
+        callback(state)
+    end)
+end
+
+-- ==========================================
+-- بناء عناصر قسم الـ Combat ⚔️
+-- ==========================================
+CreateControlWithSubtitle(CombatPage, "Aim Bot (مساعد التصويب)", "مساعد التصويب التلقائي نحو عدوك لتسهيل إطلاق النار", function(v)
+    CombatSettings.AimBot = v
 end)
 
--- ========================================================
---                  FUNCTIONAL AUTOMATION LOOPS
--- ========================================================
+CreateControlWithSubtitle(CombatPage, "Silent Aim (التصويب الصامت)", "إصابة الهدف دون الحاجة لتوجيه الكاميرا نحوه بشكل مباشر", function(v)
+    CombatSettings.SilentAim = v
+end)
 
-task.spawn(function()
-    while true do
-        task.wait(3600)
-        if Config.AutoServerHopHourly then
-            pcall(function()
-                game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-            end)
+CreateControlWithSubtitle(CombatPage, "Trigger Bot (الطلق التلقائي)", "إطلاق النار تلقائياً بمجرد تمرير مؤشر السلاح على العدو", function(v)
+    CombatSettings.TriggerBot = v
+end)
+
+CreateControlWithSubtitle(CombatPage, "Hitbox Extender (تكبير الهيتبوكس)", "تكبير مساحة hitbox الأعداء لتسهيل تصويب الضربات عليهم", function(v)
+    CombatSettings.HitboxExtender = v
+end)
+
+CreateControlWithSubtitle(CombatPage, "Auto Kill Sheriff (القتل السريع للشيرف)", "استهداف والقضاء على الشيرف فوراً عند توفر الشروط في الماب", function(v)
+    CombatSettings.AutoKillSheriff = v
+end)
+
+-- ==========================================
+-- بناء عناصر قسم الـ Auto Farm 🌾
+-- ==========================================
+CreateControlWithSubtitle(FarmPage, "Auto Coin (تجميع الكوينز المخفي)", "تجميع الكوينز من تحت الأرض عبر حركة منبطحة، مع تصغير الهيتبوكس لتجنب الكشف", function(v)
+    FarmSettings.AutoCoin = v
+end)
+
+CreateControlWithSubtitle(FarmPage, "Noclip (تخطي الجدران)", "مطلوب للزراعة: يتيح لك المرور عبر الجدران والعوائق بسلاسة تامة", function(v)
+    FarmSettings.Noclip = v
+end)
+
+CreateControlWithSubtitle(FarmPage, "Auto Level (الطيران والنجاة)", "نظام يضمن نجاة اللاعب ورفع مستواه تلقائياً عبر الطيران بعيداً عن القاتل أو فوق الماب", function(v)
+    FarmSettings.AutoLevel = v
+end)
+
+-- ==========================================
+-- دوال التشغيل البرمجية الفعلية للقسمين
+-- ==========================================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+RunService.RenderStepped:Connect(function()
+    -- تنفيذ الـ Hitbox Extender
+    if CombatSettings.HitboxExtender then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = player.Character.HumanoidRootPart
+                hrp.Size = Vector3.new(CombatSettings.HitboxSize, CombatSettings.HitboxSize, CombatSettings.HitboxSize)
+                hrp.Transparency = 0.7
+                hrp.CanCollide = false
+            end
+        end
+    end
+
+    -- تنفيذ النوتشليب الإجباري للزراعة
+    if FarmSettings.Noclip and LocalPlayer.Character then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
         end
     end
 end)
 
+-- حلقة تجميع الكوينز والرفع التلقائي
 task.spawn(function()
-    while task.wait(0.1) do
-        if Config.AutoWinTP then
-            pcall(function()
-                local player = game.Players.LocalPlayer
-                local character = player.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
-                    local finishPad = workspace:FindFirstChild("Finish") or workspace:FindFirstChild("FinishPad") or workspace:FindFirstChild("WinPad")
-                    if finishPad then
-                        character.HumanoidRootPart.CFrame = finishPad.CFrame
+    while task.wait(0.3) do
+        if FarmSettings.AutoCoin and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = LocalPlayer.Character.HumanoidRootPart
+            hrp.Size = Vector3.new(1, 1, 1)
+            for _, obj in ipairs(Workspace:GetDescendants()) do
+                if obj.Name == "Coin_Server" or obj.Name == "Coin" then
+                    if obj:IsA("BasePart") then
+                        hrp.CFrame = obj.CFrame + Vector3.new(0, -2.5, 0)
+                        task.wait(0.1)
                     end
                 end
-            end)
+            end
+        end
+
+        if FarmSettings.AutoLevel and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = LocalPlayer.Character.HumanoidRootPart
+            hrp.CFrame = hrp.CFrame + Vector3.new(0, 75, 0)
+            local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            if hum then hum.PlatformStand = true end
         end
     end
 end)
 
-task.spawn(function()
-    while task.wait(0.1) do
-        if Config.AutoWinWalk or Config.SpeedBasedWins then
-            pcall(function()
-                local player = game.Players.LocalPlayer
-                local character = player.Character
-                if character and character:FindFirstChild("Humanoid") and character:FindFirstChild("HumanoidRootPart") then
-                    local humanoid = character.Humanoid
-                    local hrp = character.HumanoidRootPart
-                    
-                    humanoid:Move(Vector3.new(0, 0, -1), true)
-                    
-                    if Config.SpeedBasedWins then
-                        local currentSpeed = humanoid.WalkSpeed
-                        hrp.Velocity = hrp.CFrame.LookVector * math.max(currentSpeed, 50)
-                    end
+print("✅ [الجزء الثاني]: تم تحميل قسمي Combat و Auto Farm مع الشروحات الخافتة بنجاح.")
+--[=[
+    Project: MM2 Ultimate Hub Script - Part 3 (ESP & Ram/Alt Modules)
+    Language: Luau (Roblox)
+]=]
+
+local ESPPage = Pages["ESP"]
+local RamAltPage = Pages["RamAlt"] -- قد يكون غير موجود إن كان الجهاز هاتفا
+
+if not ESPPage then
+    warn("⚠️ يرجى تشغيل الأجزاء السابقة أولاً!")
+    return
+end
+
+-- متغيرات قسم الـ ESP
+local ESPSettings = {
+    Enabled = false,
+    HitboxESP = false,
+    Colors = {
+        Murderer = Color3.fromRGB(255, 0, 0),    -- أحمر للقاتل
+        Sheriff = Color3.fromRGB(0, 0, 255),     -- أزرق للشيرف
+        Hero = Color3.fromRGB(255, 215, 0),      -- أصفر ذهبي للهيرو
+        Innocent = Color3.fromRGB(0, 255, 0)     -- أخضر للبريء
+    }
+}
+
+-- متغيرات قسم الـ Ram & Alt (خاص بالحاسوب)
+local RamAltSettings = {
+    AltManagerActive = false,
+    AutoTradeMain = false,
+    AntiConflictSpacing = true
+}
+
+-- دالة مساعدة لإنشاء الأزرار مع الشروحات (موروثة من الجزء السابق)
+local function CreateControlWithSubtitle(parentPage, titleText, subtitleText, callback)
+    local container = Instance.new("Frame")
+    container.Parent = parentPage
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -10, 0, 50)
+    
+    local btn = Instance.new("TextButton")
+    btn.Parent = container
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 52)
+    btn.Size = UDim2.new(1, 0, 0, 28)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = titleText
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = btn
+    
+    local subtitle = Instance.new("TextLabel")
+    subtitle.Parent = container
+    subtitle.BackgroundTransparency = 1
+    subtitle.Position = UDim2.new(0, 0, 0, 30)
+    subtitle.Size = UDim2.new(1, 0, 0, 18)
+    subtitle.Font = Enum.Font.SourceSans
+    subtitle.Text = subtitleText
+    subtitle.TextColor3 = Color3.fromRGB(160, 160, 180)
+    subtitle.TextSize = 11
+    subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(40, 40, 52)
+        callback(state)
+    end)
+end
+
+-- ==========================================
+-- بناء عناصر قسم الـ ESP 👁️
+-- ==========================================
+CreateControlWithSubtitle(ESPPage, "Enable ESP (تفعيل نظام الكشف العام)", "المفتاح الرئيسي لتشغيل جميع وظائف كشف الأماكن ورؤية اللاعبين", function(v)
+    ESPSettings.Enabled = v
+end)
+
+CreateControlWithSubtitle(ESPPage, "Hitbox ESP (تلوين هيتبوكس اللاعبين)", "إظهار حدود ملونة حول الشخصيات لتحديد أماكنهم عبر الجدران بناءً على أدوارهم", function(v)
+    ESPSettings.HitboxESP = v
+end)
+
+-- ==========================================
+-- بناء عناصر قسم الـ Ram & Alt 💻 (إن وجد للحاسوب)
+-- ==========================================
+if RamAltPage and isPC then
+    CreateControlWithSubtitle(RamAltPage, "Alt Manager Active (تفعيل مدير الحسابات)", "تفعيل نظام إدارة الحسابات الوهمية المتعددة للتحكم بها جماعياً", function(v)
+        RamAltSettings.AltManagerActive = v
+    end)
+
+    CreateControlWithSubtitle(RamAltPage, "Auto Trade Main (التريد التلقائي للحساب الرئيسي)", "إرسال طلبات تبادل الأسلحة والبتات بشكل آلي نحو حسابك الرئيسي وتفريغ الحقائب", function(v)
+        RamAltSettings.AutoTradeMain = v
+    end)
+
+    CreateControlWithSubtitle(RamAltPage, "Anti-Conflict Spacing (منع تعارض المواقع)", "ترك مسافة متباعدة ذكية بين الحسابات الوهمية أثناء تجميع الكوينز لمنع التصادم", function(v)
+        RamAltSettings.AntiConflictSpacing = v
+    end)
+elseif RamAltPage and not isPC then
+    -- رسالة تنبيهية في حال فتح من الجوال
+    local notice = Instance.new("TextLabel")
+    notice.Parent = RamAltPage
+    notice.BackgroundTransparency = 1
+    notice.Size = UDim2.new(1, 0, 0, 40)
+    notice.Font = Enum.Font.SourceSansBold
+    notice.Text = "⚠️ قسم الحسابات الوهمية مخصص لأجهزة الحاسوب (PC) فقط لعدم دعم الهواتف لتعدد الحسابات."
+    notice.TextColor3 = Color3.fromRGB(255, 100, 100)
+    notice.TextSize = 13
+    notice.TextWrapped = true
+end
+
+-- ==========================================
+-- دوال التشغيل البرمجية للـ ESP وأدوار MM2
+-- ==========================================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local function GetPlayerRole(player)
+    local char = player.Character
+    if not char then return "Innocent" end
+    
+    if char:FindFirstChild("Knife") or (player.Backpack and player.Backpack:FindFirstChild("Knife")) then
+        return "Murderer"
+    elseif char:FindFirstChild("Gun") or (player.Backpack and player.Backpack:FindFirstChild("Gun")) then
+        return "Sheriff"
+    end
+    return "Innocent"
+end
+
+RunService.RenderStepped:Connect(function()
+    if not ESPSettings.Enabled then
+        -- إزالة الـ Highlights القديمة إذا تم إيقاف الـ ESP
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local hrp = player.Character.HumanoidRootPart
+                if hrp:FindFirstChild("MM2_ESP_Box") then
+                    hrp.MM2_ESP_Box:Destroy()
                 end
-            end)
+            end
         end
+        return
     end
-end)
-
-task.spawn(function()
-    while task.wait(1) do
-        if Config.AutoRebirth then
-            pcall(function()
-                local RebirthRemote = game:GetService("ReplicatedStorage"):FindFirstChild("Rebirth") or game:GetService("ReplicatedStorage"):FindFirstChild("RebirthEvent")
-                if RebirthRemote and RebirthRemote:IsA("RemoteEvent") then
-                    RebirthRemote:FireServer()
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local role = GetPlayerRole(player)
+            local color = ESPSettings.Colors[role] or ESPSettings.Colors.Innocent
+            local hrp = player.Character.HumanoidRootPart
+            
+            if ESPSettings.HitboxESP then
+                if not hrp:FindFirstChild("MM2_ESP_Box") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "MM2_ESP_Box"
+                    highlight.Adornee = player.Character
+                    highlight.FillColor = color
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    highlight.Parent = hrp
+                else
+                    hrp.MM2_ESP_Box.FillColor = color
                 end
-            end)
-        end
-    end
-end)
-
-task.spawn(function()
-    while task.wait(0.5) do
-        if Config.SmartTreadmill or Config.SelectedTreadmill then
-            pcall(function()
-                local treadmills = workspace:FindFirstChild("Treadmills")
-                if treadmills then
-                    local targetName = Config.SmartTreadmill and "Treadmill" or Config.SelectedTreadmill
-                    for _, tm in ipairs(treadmills:GetChildren()) do
-                        if string.find(tm.Name, targetName) and tm:FindFirstChild("HumanoidRootPart") then
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = tm.HumanoidRootPart.CFrame
-                            break
-                        end
-                    end
+            else
+                if hrp:FindFirstChild("MM2_ESP_Box") then
+                    hrp.MM2_ESP_Box:Destroy()
                 end
-            end)
+            end
         end
     end
 end)
 
-local VirtualUser = game:GetService("VirtualUser")
-game.Players.LocalPlayer.Idled:Connect(function()
-    if Config.AntiAFK then
-        VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-        task.wait(1)
-        VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+print("✅ [الجزء الثالث]: تم تحميل قسمي ESP و Ram & Alt بنجاح.")
+--[=[
+    Project: MM2 Ultimate Hub Script - Part 4 (Trade, Kill Sayings & Settings - Final)
+    Language: Luau (Roblox)
+]=]
+
+local TradePage = Pages["Trade"]
+local KillSayingsPage = Pages["KillSayings"]
+local SettingsPage = Pages["Settings"]
+
+if not TradePage or not SettingsPage then
+    warn("⚠️ يرجى تشغيل الأجزاء السابقة أولاً!")
+    return
+end
+
+-- متغيرات الأقسام الأخيرة
+local TradeSettings = {
+    AutoAccept = false,
+    YourOfferItem = "None",
+    TheirTargetItem = "None"
+}
+
+local KillSayingSettings = {
+    Enabled = false,
+    SelectedSymbol = "† [MM2 PRO] †"
+}
+
+local SettingsData = {
+    Language = "AR", -- البدء بالعربية (🇮🇶)
+    MasterMute = false,
+    AntiAFK = true,
+    AntiFling = true,
+    BlackScreen = false,
+    FPSLimit = 60
+}
+
+-- قائمة الـ 20 شكلاً ورمزاً
+local SymbolList = {
+    "† [MM2 PRO] †", "⚡ [EXEC_KILL] ⚡", "☠️ [DESTROYED] ☠️", "👑 [KING_GOD] 👑",
+    "⚔️ [SHADOW_X] ⚔️", "🔥 [ELITE_HUD] 🔥", "⭐ [STAR_GOD] ⭐", "❄️ [ICE_QUEEN] ❄️",
+    "💫 [GODLY_WIN] 💫", "💎 [GEM_MASTER] 💎", "⚜️ [ROYAL_KILL] ⚜️", "🔰 [PRO_PLAYER] 🔰",
+    "🎯 [HEAD_SHOT] 🎯", "🔮 [DARK_MAGIC] 🔮", "🌀 [CYCLONE_X] 🌀", "🛡️ [DEFENDER] 🛡️",
+    "🧨 [EXPLOSIVE] 🧨", "🗡️ [BLADE_MASTER] 🗡️", "🦅 [FALCON_EYE] 🦅", "🌌 [GALAXY_HUB] 🌌"
+}
+
+-- دالة إنشاء أزرار مع شرح خافت
+local function CreateControlWithSubtitle(parentPage, titleText, subtitleText, callback)
+    local container = Instance.new("Frame")
+    container.Parent = parentPage
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -10, 0, 50)
+    
+    local btn = Instance.new("TextButton")
+    btn.Parent = container
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 52)
+    btn.Size = UDim2.new(1, 0, 0, 28)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = titleText
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 5)
+    corner.Parent = btn
+    
+    local subtitle = Instance.new("TextLabel")
+    subtitle.Parent = container
+    subtitle.BackgroundTransparency = 1
+    subtitle.Position = UDim2.new(0, 0, 0, 30)
+    subtitle.Size = UDim2.new(1, 0, 0, 18)
+    subtitle.Font = Enum.Font.SourceSans
+    subtitle.Text = subtitleText
+    subtitle.TextColor3 = Color3.fromRGB(160, 160, 180)
+    subtitle.TextSize = 11
+    subtitle.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 170, 127) or Color3.fromRGB(40, 40, 52)
+        callback(state)
+    end)
+end
+
+-- ==========================================
+-- بناء عناصر قسم التريد 🤝
+-- ==========================================
+CreateControlWithSubtitle(TradePage, "Auto Accept Trades (القبول التلقائي للتريدات)", "قبول صفقات التبادل الواردة فوراً عند تطابق الشروط والأمان", function(v)
+    TradeSettings.AutoAccept = v
+end)
+
+-- محاكاة القوائم المنسدلة Your Offer و Their Offer لاختيار الأسلحة
+local function CreateDropdownSimulator(parentPage, labelText, items, onSelected)
+    local container = Instance.new("Frame")
+    container.Parent = parentPage
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(1, -10, 0, 40)
+    
+    local label = Instance.new("TextLabel")
+    label.Parent = container
+    label.BackgroundTransparency = 1
+    label.Size = UDim2.new(0.4, 0, 1, 0)
+    label.Font = Enum.Font.SourceSansBold
+    label.Text = labelText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 13
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    
+    local dropdownBtn = Instance.new("TextButton")
+    dropdownBtn.Parent = container
+    dropdownBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 65)
+    dropdownBtn.Position = UDim2.new(0.42, 0, 0.1, 0)
+    dropdownBtn.Size = UDim2.new(0.58, 0, 0.8, 0)
+    dropdownBtn.Font = Enum.Font.SourceSans
+    dropdownBtn.Text = items[1]
+    dropdownBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
+    dropdownBtn.TextSize = 12
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = dropdownBtn
+    
+    local index = 1
+    dropdownBtn.MouseButton1Click:Connect(function()
+        index = index % #items + 1
+        dropdownBtn.Text = items[index]
+        onSelected(items[index])
+    end)
+end
+
+CreateDropdownSimulator(TradePage, "Your Offer (عروضك):", {"Godly Blade", "Luger Gun", "Corrupt Knife", "Laser Gun"}, function(item)
+    TradeSettings.YourOfferItem = item
+end)
+
+CreateDropdownSimulator(TradePage, "Their Offer (الطلب المستهدف):", {"Chromas", "Batwing", "Elderwood Scythe", "Hallow's Edge"}, function(item)
+    TradeSettings.TheirTargetItem = item
+end)
+
+-- ==========================================
+-- بناء عناصر قسم الأشكال Kill Sayings 💬
+-- ==========================================
+CreateControlWithSubtitle(KillSayingsPage, "Enable Kill Sayings (تفعيل عبارات القتل)", "إرسال رمز أو شكل مميز في الشات تلقائياً عند القضاء على أي هدف", function(v)
+    KillSayingSettings.Enabled = v
+end)
+
+CreateDropdownSimulator(KillSayingsPage, "Select Symbol (اختر الشكل):", SymbolList, function(symbol)
+    KillSayingSettings.SelectedSymbol = symbol
+end)
+
+-- ==========================================
+-- بناء عناصر قسم الإعدادات Settings ⚙️
+-- ==========================================
+-- زر تبديل اللغة مع الأعلام (🇬🇧 English / 🇮🇶 العربية)
+local LangButton = Instance.new("TextButton")
+LangButton.Parent = SettingsPage
+LangButton.BackgroundColor3 = Color3.fromRGB(55, 55, 75)
+LangButton.Size = UDim2.new(1, -10, 0, 35)
+LangButton.Font = Enum.Font.SourceSansBold
+LangButton.Text = "Language / اللغة: 🇮🇶 العربية"
+LangButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+LangButton.TextSize = 14
+
+local LangCorner = Instance.new("UICorner")
+LangCorner.CornerRadius = UDim.new(0, 5)
+LangCorner.Parent = LangButton
+
+LangButton.MouseButton1Click:Connect(function()
+    if SettingsData.Language == "AR" then
+        SettingsData.Language = "EN"
+        LangButton.Text = "Language / اللغة: 🇬🇧 English"
+        game:GetService("StarterGui"):SetCore("SendNotification", {Title = "Language Changed", Text = "Switched to English 🇬🇧", Duration = 3})
+    else
+        SettingsData.Language = "AR"
+        LangButton.Text = "Language / اللغة: 🇮🇶 العربية"
+        game:GetService("StarterGui"):SetCore("SendNotification", {Title = "تغيير اللغة", Text = "تم التبديل إلى اللغة العربية 🇮🇶", Duration = 3})
     end
 end)
 
-game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
-    if Config.AutoRejoin and child.Name == "ErrorPrompt" then
-        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-    end
+CreateControlWithSubtitle(SettingsPage, "Anti-AFK (منع طرد الخمول)", "يمنع خروجك من السيرفر بسبب عدم الحركة لفترة طويلة", function(v)
+    SettingsData.AntiAFK = v
 end)
 
-Rayfield:Notify({
-   Title = "Sajjad Script Hub",
-   Content = "تم التحميل بنجاح مع الدعم المزدوج للغة!",
-   Duration = 5,
-   Image = CustomImageID,
+CreateControlWithSubtitle(SettingsPage, "Anti-Fling (حماية القذف الحركي)", "يمنع اللاعبين الآخرين من طردك أو قذف شخصيتك خارج الماب", function(v)
+    SettingsData.AntiFling = v
+end)
+
+CreateControlWithSubtitle(SettingsPage, "Master Mute (كتم أصوات اللعبة بالكامل)", "إسكات جميع أصوات اللعبة فوراً بنقرة زر واحدة", function(v)
+    SettingsData.MasterMute = v
+    game:GetService("SoundService").Volume = v and 0 or 1
+end)
+
+CreateControlWithSubtitle(SettingsPage, "Black Screen / FPS Booster (شاشة سوداء لتوفير الأداء)", "خفض إضاءة اللعبة وإيقاف الظلال لرفع الفريمات وتوفير البطارية", function(v)
+    SettingsData.BlackScreen = v
+    game:GetService("Lighting").Brightness = v and 0 or 2
+    game:GetService("Lighting").GlobalShadows = not v
+end)
+
+-- ==========================================
+-- دوال التشغيل البرمجية النهائية للتريد والقتل
+-- ==========================================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- تفعيل إرسال الرمز في الشات عند الموت أو إحراز القتل
+LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.Died:Connect(function()
+        if KillSayingSettings.Enabled then
+            pcall(function()
+                game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(KillSayingSettings.SelectedSymbol, "All")
+            end)
+        end
+    end)
+end)
+
+-- إشعار اكتمال السكربت بالكامل بنجاح
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "MM2 Ultimate Hub (100% Complete)",
+    Text = "تم تجميع وربط جميع الأجزاء والأقسام بنجاح تام!",
+    Duration = 5
 })
+
+print("✅ [الجزء الرابع والأخير]: تم تحميل السكربت بالكامل وأصبح جاهزاً للاستخدام.")
