@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقعي الشخصي والسياسات</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: var(--primary);
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .section {
+            display: none;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        .section.active {
+            display: block;
+        }
+        h1, h2 {
+            color: var(--primary);
+        }
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>موقعي الشخصي</h2>
+        <nav>
+            <a href="#" onclick="showSection('home')">الرئيسية</a>
+            <a href="#" onclick="showSection('privacy')">سياسة الخصوصية</a>
+            <a href="#" onclick="showSection('terms')">شروط الخدمة</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- قسم الرئيسية -->
+        <div id="home" class="section active">
+            <h1>أهلاً بك في موقعي الرسمي</h1>
+            <p>أنا مطور شغوف بالتكنولوجيا والبرمجة. هذا الموقع مخصص لعرض مشارعي، أدواتي، وروابط التواصل الخاصة بي.</p>
+            <a href="#" class="btn" onclick="showSection('privacy')">عرض سياسة الخصوصية</a>
+        </div>
+
+        <!-- قسم سياسة الخصوصية (Privacy Policy) -->
+        <div id="privacy" class="section">
+            <h1>سياسة الخصوصية (Privacy Policy)</h1>
+            <p>نحن نحترام خصوصية المستخدمين ونلتزم بحمايتها. توضح هذه السياسة كيف يتم التعامل مع البيانات:</p>
+            <ul>
+                <li><strong>جمع البيانات:</strong> نحن لا نقوم بجمع أي معلومات شخصية حساسة عن زوار هذا الموقع أو مستخدمي الأدوات التابعة له إلا ما تتطلبه خدمات المنصات الخارجية المصرحة (مثل تسجيل الدخول أو التوثيق).</li>
+                <li><strong>استخدام البيانات:</strong> تُستخدم أي بيانات تقنية فقط لأغراض تحسين تجربة الأداء وضمان عمل التطبيقات والأدوات بشكل سليم.</li>
+                <li><strong>ملفات الارتباط (Cookies):</strong> قد يستخدم الموقع تقنيات قياسية لتحسين التصفح.</li>
+                <li><strong>التعديلات:</strong> قد يتم تحديث هذه السياسة من وقت لآخر، ويُعد استمرارك في استخدام الخدمات موافقة عليها.</li>
+            </ul>
+        </div>
+
+        <!-- قسم شروط الخدمة (Terms of Service) -->
+        <div id="terms" class="section">
+            <h1>شروط الخدمة (Terms of Service)</h1>
+            <p>باستخدامك لهذا الموقع أو الخدمات والأدوات المرتبطة به، فإنك توافق على الشروط التالية:</p>
+            <ul>
+                <li><strong>شروط الاستخدام:</strong> يجب استخدام الأدوات والخدمات بطريقة قانونية وعدم محاولة اختراقها أو الإضرار بها.</li>
+                <li><strong>المسؤولية:</strong> يتم تقديم الخدمات والأدوات "كما هي" دون ضمانات صريحة أو ضمنية حول خلوها التام من الأخطاء النادرة.</li>
+                <li><strong>الملكية الفكرية:</strong> جميع الحقوق الخاصة باكواد البرمجة والمحتوى المعروض محفوظة للمطور.</li>
+                <li><strong>التواصل:</strong> لأي استفسارات تتعلق بالشروط أو الخصوصية، يمكنك التواصل معنا عبر قنوات الاتصال المتاحة.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            window.location.hash = sectionId;
+        }
+
+        // تفعيل التنقل حسب الرابط (Hash) عند فتح الصفحة مباشرة
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                showSection(hash);
+            }
+        });
+    </script>
+</body>
+</html>
